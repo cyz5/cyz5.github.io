@@ -1,0 +1,10 @@
+{% extends "main.html" %}
+
+{#
+  首页不要自动 H1（标题已经在 hero 里），所以只输出正文。
+#}
+{% block content %}
+  <article class="md-content__inner md-typeset">
+    {{ page.content }}
+  </article>
+{% endblock %}

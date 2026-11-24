@@ -1,0 +1,4 @@
+mkdocs-material==9.8.1
+pymdown-extensions==13.0
+PyYAML>=6.0
+jieba==0.42.1

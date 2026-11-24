@@ -1,0 +1,339 @@
+/* 嵌入式能力地图 · 基础样式与组件 */
+:root {
+  --ink: #14202b;
+  --ink-soft: #3d4c5a;
+  --muted: #6b7a88;
+  --line: #e3e9ec;
+  --bg: #fbfcfc;
+  --bg-soft: #f4f8f7;
+  --card: #ffffff;
+  --teal: #0f766e;
+  --teal-bright: #14b8a6;
+  --teal-soft: rgba(15, 118, 110, .08);
+  --amber: #c2700c;
+  --amber-soft: rgba(194, 112, 12, .1);
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(16, 32, 43, .04), 0 8px 24px -12px rgba(16, 32, 43, .12);
+
+  --md-primary-fg-color: #0f766e;
+  --md-primary-fg-color--light: #14b8a6;
+  --md-primary-fg-color--dark: #115e59;
+  --md-accent-fg-color: #c2700c;
+  --md-typeset-a-color: #0f766e;
+}
+
+[data-md-color-scheme="slate"] {
+  --ink: #e6edf3;
+  --ink-soft: #c3cfda;
+  --muted: #93a3b1;
+  --line: #26313a;
+  --bg: #0e1418;
+  --bg-soft: #121a20;
+  --card: #151e25;
+  --teal: #2dd4bf;
+  --teal-bright: #5eead4;
+  --teal-soft: rgba(45, 212, 191, .08);
+  --amber: #fbbf24;
+  --amber-soft: rgba(251, 191, 36, .1);
+  --md-primary-fg-color: #0f766e;
+  --md-primary-fg-color--light: #14b8a6;
+  --md-primary-fg-color--dark: #115e59;
+  --md-accent-fg-color: #fbbf24;
+  --md-typeset-a-color: #2dd4bf;
+}
+
+body,
+.md-container {
+  background-color: var(--bg);
+}
+
+.md-header,
+.md-tabs {
+  background-color: #0d2b2a;
+  box-shadow: none;
+}
+
+[data-md-color-scheme="slate"] .md-header,
+[data-md-color-scheme="slate"] .md-tabs {
+  background-color: #0a1d1c;
+}
+
+.md-grid {
+  max-width: 84rem;
+}
+
+.md-main__inner {
+  margin-top: 1.2rem;
+}
+
+.md-content__inner {
+  max-width: 54rem;
+  padding-bottom: 3rem;
+}
+
+.md-typeset {
+  color: var(--ink);
+  font-size: .82rem;
+  line-height: 1.92;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
+}
+
+.md-typeset h1 {
+  color: var(--ink);
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  margin: 0 0 .6rem;
+}
+
+.md-typeset h2 {
+  color: var(--ink);
+  font-size: 1.22rem;
+  font-weight: 700;
+  margin: 2.4rem 0 .9rem;
+  padding-top: .2rem;
+  border-top: 1px solid var(--line);
+}
+
+.md-typeset h3 {
+  color: var(--ink);
+  font-size: 1.02rem;
+  font-weight: 650;
+  margin: 1.8rem 0 .6rem;
+}
+
+.md-typeset p,
+.md-typeset li {
+  color: var(--ink-soft);
+}
+
+.md-typeset strong {
+  color: var(--ink);
+}
+
+.md-typeset a {
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color .15s;
+}
+
+.md-typeset a:hover {
+  border-bottom-color: currentColor;
+}
+
+.md-typeset blockquote {
+  color: var(--muted);
+  border-left: 3px solid var(--line);
+  background: var(--bg-soft);
+  border-radius: 0 8px 8px 0;
+  padding: .5rem 1rem;
+}
+
+.md-typeset code {
+  font-size: .74rem;
+  background: var(--bg-soft);
+  border-radius: 5px;
+  padding: .12em .35em;
+}
+
+.md-typeset pre > code {
+  font-size: .715rem;
+  line-height: 1.68;
+  padding: .9rem 1rem;
+}
+
+.md-typeset .highlight {
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  margin: 1rem 0;
+}
+
+.md-typeset .highlight pre {
+  margin: 0;
+}
+
+.md-clipboard {
+  color: var(--muted);
+}
+
+.md-typeset table:not([class]) {
+  font-size: .74rem;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow: hidden;
+}
+
+.md-typeset table:not([class]) th {
+  background: var(--bg-soft);
+  color: var(--ink);
+  font-weight: 600;
+  border-bottom: 1px solid var(--line);
+}
+
+.md-typeset table:not([class]) td {
+  border-top: 1px solid var(--line);
+}
+
+.md-typeset .task-list-item {
+  list-style: none;
+}
+
+.md-typeset .task-list-control .task-list-indicator::before {
+  background-color: var(--teal);
+}
+
+.md-typeset .admonition,
+.md-typeset details {
+  border-radius: 10px;
+  border-width: 1px;
+  box-shadow: none;
+  font-size: .78rem;
+}
+
+.md-nav {
+  font-size: .7rem;
+}
+
+.md-nav__link--active,
+.md-nav__link:is(:focus, :hover) {
+  color: var(--teal);
+}
+
+.md-sidebar--primary .md-nav__title {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.md-sidebar--primary .md-nav__link {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.md-search__form {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .12);
+}
+
+.md-footer {
+  background: #0d2b2a;
+}
+
+.md-footer-meta {
+  background: #0a201f;
+}
+
+/* ---------- 通用 ---------- */
+.page-head {
+  margin: .2rem 0 2rem;
+}
+
+.lead {
+  color: var(--muted);
+  font-size: .86rem;
+  line-height: 1.75;
+  margin: .3rem 0 1rem !important;
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem;
+  font-size: .7rem;
+  color: var(--muted);
+  margin: 0 0 .7rem;
+}
+
+.crumbs a {
+  color: var(--muted);
+}
+
+.crumbs a:hover {
+  color: var(--teal);
+}
+
+.crumbs span {
+  color: var(--line);
+}
+
+.lesson-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin: 0 0 1.8rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: .18rem .55rem;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: .66rem;
+  line-height: 1.5;
+  background: var(--card);
+}
+
+.chip-id {
+  color: var(--teal);
+  border-color: var(--teal-soft);
+  background: var(--teal-soft);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip-ok {
+  color: var(--teal);
+  border-color: var(--teal-soft);
+}
+
+.chip-todo {
+  color: var(--amber);
+  border-color: var(--amber-soft);
+  background: var(--amber-soft);
+}
+
+.bar {
+  height: 6px;
+  border-radius: 99px;
+  background: var(--teal-soft);
+  overflow: hidden;
+  margin: .55rem 0 0;
+}
+
+.bar i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--teal), var(--teal-bright));
+}
+
+.bar.wide {
+  height: 8px;
+  margin: 1rem 0 0;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.status {
+  display: inline-block;
+  padding: .1rem .45rem;
+  border-radius: 5px;
+  font-size: .66rem;
+  white-space: nowrap;
+}
+
+.status.done {
+  color: var(--teal);
+  background: var(--teal-soft);
+}
+
+.status.todo {
+  color: var(--amber);
+  background: var(--amber-soft);
+}
