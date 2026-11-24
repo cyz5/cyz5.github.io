@@ -27,6 +27,8 @@ theme:
         icon: material/weather-sunny
         name: 切换到日间模式
   features:
+    - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.tracking
     - navigation.indexes
     - navigation.top
@@ -41,6 +43,7 @@ theme:
 extra_css:
   - assets/base.css
   - assets/site.css
+  - assets/theme.css
 extra_javascript:
   - assets/extra.js
 

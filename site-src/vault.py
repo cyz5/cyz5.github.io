@@ -94,7 +94,7 @@ class Lesson:
     chars: int = 0
     lines: int = 0
     code_blocks: int = 0
-    minutes: int = 0
+    body_chars: int = 0
     summary: str = ""
     mtime: float = 0.0
     slug: str = ""
@@ -158,7 +158,6 @@ class Vault:
                     continue
                 code = text.count("\n```") // 2
                 body_chars = len(plain(text))
-                minutes = max(4, round(body_chars / 420 + code * 0.35))
                 para = ""
                 for block in re.split(r"\n\s*\n", text):
                     b = block.strip()
@@ -169,7 +168,8 @@ class Vault:
                 lesson = Lesson(
                     stem=stem, rel=rel, body=text, chars=len(text),
                     lines=text.count("\n") + 1, code_blocks=code,
-                    minutes=minutes, summary=para, mtime=os.path.getmtime(path))
+                    body_chars=body_chars, summary=para,
+                    mtime=os.path.getmtime(path))
                 self.lessons[stem] = lesson
 
     # ---------- 能力地图 ----------
@@ -277,12 +277,13 @@ class Vault:
 
     def stats(self) -> dict:
         points = self.all_points()
+        lessons = [p.lesson for p in points if p.lesson]
         return dict(
             points=len(points),
-            lessons=sum(1 for p in points if p.lesson),
-            codes=sum(l.code_blocks for p in points if p.lesson for l in [p.lesson]),
-            chars=sum(l.chars for p in points if p.lesson for l in [p.lesson]),
-            minutes=sum(p.lesson.minutes for p in points if p.lesson),
+            lessons=len(lessons),
+            codes=sum(l.code_blocks for l in lessons),
+            chars=sum(l.chars for l in lessons),
+            words=sum(l.body_chars for l in lessons),
             chapters=len(self.chapters),
             sections=sum(len(c.sections) for c in self.chapters),
         )

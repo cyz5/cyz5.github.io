@@ -97,6 +97,7 @@ def main() -> int:
 
     # ---- 静态页 ----
     write("index.md", site.home())
+    write("courses.md", site.courses_page())
     write("map.md", site.map_page())
     write("roadmap.md", site.roadmap_page())
 
@@ -105,13 +106,12 @@ def main() -> int:
         "REPO": cfg_obj.repo, "LABS_REPO": cfg_obj.labs_repo, "AUTHOR": cfg_obj.author,
         "POINTS": st["points"], "LESSONS": st["lessons"], "CODES": f"{st['codes']:,}",
         "CHAPTERS": st["chapters"], "SECTIONS": st["sections"],
-        "MINUTES": f"{st['minutes']:,}", "HOURS": round(st["minutes"] / 60),
-        "COVERAGE": round(st["lessons"] * 100 / st["points"]),
+        "WORDS": f"{st['words']:,}", "COVERAGE": round(st["lessons"] * 100 / st["points"]),
     }
     for name, title in (("labs", "练习库"), ("about", "关于")):
         with io.open(os.path.join(HERE, "content", f"{name}.md"), encoding="utf-8") as f:
             body = fill(f.read(), ctx)
-        write(f"{name}.md", pages.page({"title": title}, body))
+        write(f"{name}.md", pages.page({"title": title, "hide": ["navigation"]}, body))
 
     # ---- 章节 / 小节 / 课程 / 占位 ----
     n_lessons = n_stubs = 0
@@ -130,7 +130,7 @@ def main() -> int:
     # ---- 静态资源 ----
     assets = os.path.join(DOCS, "assets")
     os.makedirs(assets, exist_ok=True)
-    for fn in ("base.css", "site.css", "extra.js"):
+    for fn in ("base.css", "site.css", "theme.css", "extra.js"):
         shutil.copyfile(os.path.join(HERE, "assets", fn), os.path.join(assets, fn))
 
     # ---- mkdocs 配置 ----
@@ -178,14 +178,8 @@ def main() -> int:
 
 
 def build_nav(site: "pages.Site", v) -> list:
-    nav = [
-        {"首页": "index.md"},
-        {"能力地图": "map.md"},
-        {"学习路线": "roadmap.md"},
-        {"练习库": "labs.md"},
-        {"关于": "about.md"},
-    ]
-    chapters = []
+    nav = [{"首页": "index.md"}]
+    chapters = [{"课程总览": "courses.md"}]
     for c in v.chapters:
         items = [site.ch_doc(c)]
         for s in c.sections:
@@ -196,6 +190,12 @@ def build_nav(site: "pages.Site", v) -> list:
             items.append({f"{s.no} {s.title}": sec})
         chapters.append({f"第 {c.no} 章 · {c.title}": items})
     nav.append({"课程": chapters})
+    nav += [
+        {"能力地图": "map.md"},
+        {"学习路线": "roadmap.md"},
+        {"练习库": "labs.md"},
+        {"关于": "about.md"},
+    ]
     return nav
 
 

@@ -17,6 +17,35 @@ from vault import Chapter, Lesson, Point, Section, Vault
 WIKI_RE = re.compile(r"\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|([^\]]+))?\]\]")
 CN_TZ = ZoneInfo("Asia/Shanghai")
 
+CHAPTER_ICONS = {
+    1: "🧩", 2: "🧱", 3: "🔌", 4: "⏱️", 5: "🐧", 6: "🏗️", 7: "⚙️",
+    8: "🌐", 9: "🎛️", 10: "🛡️", 11: "🔬", 12: "🤝", 13: "🤖", 14: "🧭",
+}
+
+CHAPTER_TAGLINES = {
+    1: "指针、内存、预处理器与编译链接",
+    2: "类与对象、RAII、constexpr 与 C/C++ 混编",
+    3: "Cortex-M 内核、外设驱动、DMA 与低功耗",
+    4: "任务、同步、内存管理、移植与系统调试",
+    5: "驱动开发、设备树、构建系统与实时性",
+    6: "分层架构、模块化、状态机与中间件",
+    7: "构建、CI/CD、测试体系与代码质量",
+    8: "CAN、EtherCAT、TCP/IP 与工业以太网",
+    9: "电机控制、电源管理、传感器融合与 HMI",
+    10: "功能安全、信息安全与合规标准",
+    11: "实时性分析、DSP、OTA 与故障诊断",
+    12: "项目管理、文档、沟通与问题解决",
+    13: "TinyML、推理框架与边缘部署",
+    14: "需求建模、业务状态机、容错与可维护性",
+}
+
+
+def fmt_words(n: int) -> str:
+    """客观字数，不用「阅读时长」这种估算。"""
+    if n >= 10000:
+        return f"{n / 10000:.1f} 万字"
+    return f"{n:,} 字"
+
 
 def fmt_date(ts: float) -> str:
     try:
@@ -218,15 +247,18 @@ class Site:
     def home(self) -> str:
         doc = "index.md"
         st = self.stats
-        hours = round(st["minutes"] / 60)
+        words = st["words"]
         coverage = round(st["lessons"] * 100 / st["points"])
         cards = []
         for c in self.v.chapters:
             pct = 0 if not c.total else round(c.done * 100 / c.total)
+            icon = CHAPTER_ICONS.get(c.no, "📘")
+            tagline = CHAPTER_TAGLINES.get(c.no, "")
             cards.append(f"""<a class="chapter-card" href="{esc(href(doc, self.ch_doc(c)))}">
-  <div class="cc-top"><span class="cc-no">{c.no:02d}</span><span class="cc-pct">{pct}%</span></div>
+  <div class="cc-top"><span class="cc-icon">{icon}</span><span class="cc-ch">CH {c.no:02d}</span><span class="cc-pct">{pct}%</span></div>
   <h3>{esc(c.title)}</h3>
-  <p>{len(c.sections)} 个小节 · {c.done} / {c.total} 节</p>
+  <p class="cc-tag">{esc(tagline)}</p>
+  <p class="cc-meta">{len(c.sections)} 个小节 · {c.done} / {c.total} 节</p>
   {bar(c.done, c.total)}
 </a>""")
         recent = sorted([p for p in self.order if p.lesson],
@@ -235,27 +267,56 @@ class Site:
             f'<li><a href="{esc(href(doc, self.pt_doc(p)))}"><span class="r-no">{p.no}</span>'
             f'{esc(p.title)}</a><time>{fmt_date(p.lesson.mtime)}</time></li>'
             for p in recent)
+        ch = {c.no: c for c in self.v.chapters}
 
         body = f"""
 <section class="hero">
   <div class="hero-bg" aria-hidden="true"></div>
   <div class="hero-inner">
-    <p class="eyebrow">EMBEDDED SYSTEMS · 能力地图 2026</p>
-    <h1>嵌入式高级工程师<br><span>能力地图与课程</span></h1>
-    <p class="hero-sub">{st['points']} 个技能点 · {st['sections']} 个小节 · {st['lessons']} 节已上线课程 · {num(st['codes'])} 段工程代码</p>
-    <div class="hero-actions">
-      <a class="btn btn-primary" href="{esc(href(doc, 'p/1-1-1/index.md'))}">从第一节开始 →</a>
-      <a class="btn" href="{esc(href(doc, 'map.md'))}">打开能力地图</a>
+    <div class="hero-copy">
+      <p class="eyebrow">EMBEDDED SYSTEMS · 2026</p>
+      <h1>嵌入式高级工程师<br><span>能力地图与课程</span></h1>
+      <p class="hero-sub">{st['points']} 个技能点 · {st['lessons']} 节课程 · {num(st['codes'])} 段工程代码</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="{esc(href(doc, 'p/1-1-1/index.md'))}">从第一节开始 →</a>
+        <a class="btn" href="{esc(href(doc, 'map.md'))}">打开能力地图</a>
+      </div>
+    </div>
+    <div class="hero-code" aria-hidden="true">
+      <div class="code-window">
+        <div class="code-bar"><i></i><i></i><i></i><span>gpio_irq.c</span></div>
+        <pre><code><span class="tok-c">/* 3.2.1 GPIO 中断 */</span>
+<span class="tok-k">void</span> <span class="tok-f">EXTI0_IRQHandler</span>(<span class="tok-k">void</span>)
+{{
+    <span class="tok-f">exti_clear_pending</span>(<span class="tok-n">PIN_0</span>);
+    <span class="tok-f">event_push</span>(<span class="tok-n">PIN_0</span>,
+                 <span class="tok-f">gpio_read</span>(<span class="tok-n">GPIOA</span>, <span class="tok-n">PIN_0</span>));
+}}</code></pre>
+      </div>
     </div>
   </div>
 </section>
 
 <div class="stats">
-  <div class="stat"><strong>{st['points']}</strong><span>技能点</span></div>
-  <div class="stat"><strong>{st['lessons']}</strong><span>已上线课程</span></div>
-  <div class="stat"><strong>{num(st['codes'])}</strong><span>代码示例</span></div>
-  <div class="stat"><strong>{hours}</strong><span>小时精读量</span></div>
+  <div class="stat"><span class="stat-icon">🧭</span><strong>{st['points']}</strong><span class="stat-label">技能点</span></div>
+  <div class="stat"><span class="stat-icon">📚</span><strong>{st['lessons']}</strong><span class="stat-label">已上线课程</span></div>
+  <div class="stat"><span class="stat-icon">✍️</span><strong>{words / 10000:.0f}<em>万</em></strong><span class="stat-label">课程正文字数</span></div>
+  <div class="stat"><span class="stat-icon">💻</span><strong>{num(st['codes'])}</strong><span class="stat-label">代码示例</span></div>
 </div>
+
+<section class="section">
+  <div class="section-head">
+    <h2>学习路径</h2>
+    <p>从语言基础到电机控制，按依赖顺序推进；也可以直接跳到你现在的位置。</p>
+  </div>
+  <ol class="path">
+    <li><a href="{esc(href(doc, self.ch_doc(ch[1])))}"><span class="path-no">01</span><span class="path-text"><strong>C 语言深度</strong><small>指针 · 内存 · 编译链接</small></span></a></li>
+    <li><a href="{esc(href(doc, self.ch_doc(ch[3])))}"><span class="path-no">02</span><span class="path-text"><strong>MCU 硬件与底层</strong><small>内核 · 外设 · DMA</small></span></a></li>
+    <li><a href="{esc(href(doc, self.ch_doc(ch[4])))}"><span class="path-no">03</span><span class="path-text"><strong>RTOS 技术栈</strong><small>任务 · 同步 · 实时性</small></span></a></li>
+    <li><a href="{esc(href(doc, self.ch_doc(ch[8])))}"><span class="path-no">04</span><span class="path-text"><strong>通信协议</strong><small>CAN · EtherCAT · TCP/IP</small></span></a></li>
+    <li><a href="{esc(href(doc, self.ch_doc(ch[9])))}"><span class="path-no">05</span><span class="path-text"><strong>电机控制</strong><small>FOC · SVPWM · PID</small></span></a></li>
+  </ol>
+</section>
 
 <section class="section">
   <div class="section-head">
@@ -311,7 +372,41 @@ class Site:
 </section>
 """
         return page({"title": "首页", "description": self.cfg.description,
-                     "hide": ["toc"], "template": "home.html"}, body)
+                     "hide": ["navigation", "toc"], "template": "home.html"}, body)
+
+    # ============================================================ 课程总览
+    def courses_page(self) -> str:
+        doc = "courses.md"
+        st = self.stats
+        rows = []
+        for c in self.v.chapters:
+            icon = CHAPTER_ICONS.get(c.no, "📘")
+            tagline = CHAPTER_TAGLINES.get(c.no, "")
+            pct = 0 if not c.total else round(c.done * 100 / c.total)
+            secs = " · ".join(f"{s.no} {s.title}" for s in c.sections[:3])
+            if len(c.sections) > 3:
+                secs += " …"
+            rows.append(f"""<a class="course-row" href="{esc(href(doc, self.ch_doc(c)))}">
+  <span class="cr-icon">{icon}</span>
+  <span class="cr-main">
+    <span class="cr-title">第 {c.no} 章 · {esc(c.title)}</span>
+    <span class="cr-desc">{esc(tagline)}</span>
+    <span class="cr-secs">{esc(secs)}</span>
+    {bar(c.done, c.total)}
+  </span>
+  <span class="cr-stat"><strong>{pct}%</strong><small>{c.done} / {c.total} 节</small></span>
+</a>""")
+        body = f"""
+<div class="page-head">
+  <p class="lead">{st['chapters']} 个章节 · {st['sections']} 个小节 · {st['points']} 个技能点，其中 {st['lessons']} 节已有完整课程。点任意章节进入小节与课程列表。</p>
+</div>
+<div class="course-list">
+{chr(10).join(rows)}
+</div>
+"""
+        return page({"title": "课程",
+                     "description": f"按能力地图组织的 {st['chapters']} 个章节，{st['lessons']} 节课程。"},
+                    body)
 
     # ============================================================ 能力地图
     def map_page(self) -> str:
@@ -328,7 +423,7 @@ class Site:
                     f'<a href="{esc(href(doc, self.sec_doc(s)))}">{esc(s.no)} {esc(s.title)}</a>'
                     f'<span>{s.done} / {s.total}</span></td></tr>')
                 for p in s.points:
-                    status = (f'<span class="status done">{p.lesson.minutes} 分钟</span>'
+                    status = (f'<span class="status done">{p.lesson.code_blocks} 段代码</span>'
                               if p.lesson else '<span class="status todo">待撰写</span>')
                     rows.append(f"""<tr data-point="{esc(p.no)}" data-text="{esc((p.no + p.title).lower())}">
   <td class="no">{p.no}</td>
@@ -366,7 +461,8 @@ class Site:
 {chr(10).join(blocks)}
 """
         return page({"title": "能力地图",
-                     "description": f"{st['points']} 个嵌入式技能点的完整清单，含课程状态与掌握度记录。"},
+                     "description": f"{st['points']} 个嵌入式技能点的完整清单，含课程状态与掌握度记录。",
+                     "hide": ["navigation"]},
                     body)
 
     # ============================================================ 章节页
@@ -403,7 +499,7 @@ class Site:
         for p in s.points:
             if p.lesson:
                 course = (f'<a href="{esc(href(doc, self.pt_doc(p)))}">阅读</a>'
-                          f'<span class="muted">{p.lesson.minutes} 分钟</span>')
+                          f'<span class="muted">{fmt_words(p.lesson.body_chars)}</span>')
             else:
                 course = '<span class="muted">待撰写</span>'
             rows.append(f"""<tr>
@@ -450,8 +546,8 @@ class Site:
         body = WIKI_RE.sub(lambda m: self._wiki(m, doc), L.body)
         body = tag_fences(body)
         chips = [self.chip(p.no, "chip-id"),
+                 self.chip(fmt_words(L.body_chars)),
                  self.chip(f"{L.code_blocks} 段代码"),
-                 self.chip(f"约 {L.minutes} 分钟"),
                  self.chip("已上线", "chip-ok")]
         head = f"""
 {self.breadcrumb(doc, p.chapter, p.section)}
@@ -495,7 +591,7 @@ class Site:
         doc = self.pt_doc(p)
         sibs = [x for x in p.section.points if x.lesson and x is not p][:6]
         sib_html = "".join(
-            f'<li>{self.point_link(doc, x)}<span class="muted">{x.lesson.minutes} 分钟</span></li>'
+            f'<li>{self.point_link(doc, x)}<span class="muted">{x.lesson.code_blocks} 段代码</span></li>'
             for x in sibs) or '<li class="muted">同小节暂无已上线课程</li>'
         prev_p, next_p = self._siblings(p)
         nav = ['<nav class="prevnext">']
@@ -575,5 +671,6 @@ class Site:
 <p class="note">说明：本页只保留技术路线与优先级，不含薪资、公司、个人履历等信息。</p>
 """
         return page({"title": "学习路线",
-                     "description": "按目标岗位筛出的学习优先级：精通档五项、熟练档四项、了解档四项。"},
+                     "description": "按目标岗位筛出的学习优先级：精通档五项、熟练档四项、了解档四项。",
+                     "hide": ["navigation"]},
                     body)
